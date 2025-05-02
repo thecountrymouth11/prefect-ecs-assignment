@@ -1,6 +1,6 @@
-output "ecs_cluster_arn" {
-  description = "ARN of the ECS cluster"
-  value       = aws_ecs_cluster.prefect_cluster.arn
+output "secret_arn" {
+  description = "ARN of the Secrets Manager secret"
+  value       = aws_secretsmanager_secret.prefect_api_key.arn
 }
 
 output "verification_instructions" {
