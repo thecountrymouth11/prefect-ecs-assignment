@@ -1,6 +1,6 @@
 # Secrets Manager for Prefect API Key
 resource "aws_secretsmanager_secret" "prefect_api_key" {
-  name = "prefect-api-key"
+  name = "prefect-api-key-new"
 }
 
 resource "aws_secretsmanager_secret_version" "prefect_api_key_version" {

@@ -20,4 +20,7 @@ I chose Terraform because it’s easy to use and works with many clouds, not jus
    cd terraform
    terraform init
    terraform plan -out=tfplan
-   terraform apply tfplan
+   terraform apply tfplain
+```
+5. **How to Check**:
+- Check Secrets Manager for 'prefect-api-key-new'
