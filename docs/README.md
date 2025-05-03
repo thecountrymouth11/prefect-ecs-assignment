@@ -1,54 +1,64 @@
-Prefect Worker on AWS ECS Fargate
-Purpose
-   Deploys a Prefect worker on AWS ECS Fargate using Terraform, intended for a Prefect Cloud ECS work pool. Free-tier limits to Prefect:managed work pool, verified via CloudWatch logs.
-IaC Tool
+# Prefect Worker on Amazon ECS with Terraform
 
-Tool: Terraform
-Rationale: Flexible, readable HCL, robust state management.
+   ## Purpose
+   This project sets up a **Prefect worker** on **AWS ECS Fargate** using **Terraform** to execute tasks from **Prefect Cloud**. Due to AWS Free Tier limitations, only a `Prefect:managed` work pool is supported. ECS worker functionality is verified via **CloudWatch logs**.
 
-Deployment Instructions
+   ---
 
-Prerequisites:
-AWS account (sandbox), Terraform (>= 1.2.0), AWS CLI, Prefect Cloud account.
-Configure AWS CLI: aws configure.
-Set terraform.tfvars: aws_region, prefect_api_key, prefect_api_url, prefect_account_id, prefect_workspace_id.
+   ## Why Terraform?
+   - Flexible, readable HCL syntax
+   - Cross-cloud support
+   - Robust state management (easier than **CloudFormation**)
 
+   ---
 
-Steps:cd terraform
-terraform init
-terraform plan -out=tfplan
-terraform apply tfplan
+   ## Prerequisites
+   You will need:
+   - An **AWS account** (sandbox recommended)
+   - [**Terraform**](https://www.terraform.io/downloads) version >= 1.2.0
+   - [**AWS CLI**](https://aws.amazon.com/cli/) installed and configured
+   - A [**Prefect Cloud**](https://www.prefect.io/cloud/) account with:
+     - API Key
+     - A `Prefect:managed` work pool  
+       *(Note: ECS work pools require a paid Prefect plan)*
 
+   ---
 
+   ## Setup Instructions
+   ### 1. Clone the Repository
+   ```bash
+   git clone https://github.com/yourusername/prefect-ecs-assignment.git
+   cd prefect-ecs-assignment/terraform
+   ```
 
-Verification Steps
+   ### 2. Configure AWS CLI
+   ```bash
+   aws configure
+   ```
 
-AWS Console (ap-south-1):
-ECS > Clusters: Confirm prefect-cluster.
-ECS > Services: Verify dev-worker running (1 task).
-Secrets Manager: Check prefect-api-key-new-2.
-IAM > Roles: Confirm prefect-task-execution-role.
-VPC: Verify prefect-ecs VPC, 6 subnets, NAT gateway, tags (Name = prefect-ecs).
-CloudWatch > Log Groups: Check /ecs/prefect-worker for worker logs (startup, API connection attempts).
+   ### 3. Add Prefect Details
+   - Edit `terraform.tfvars` with:
+     - `aws_region`
+     - `prefect_api_key`
+     - `prefect_api_url`
+     - `prefect_account_id`
+     - `prefect_workspace_id`
 
+   ### 4. Deploy the Infrastructure
+   ```bash
+   terraform init
+   terraform plan -out=tfplan
+   terraform apply tfplan
+   ```
 
-Prefect Cloud (https://app.prefect.cloud):
-Free-tier: Only Prefect:managed work pool supported.
-Verification: ECS worker operational via CloudWatch logs due to ECS work pool limitation.
-Paid plan: Create ECS work pool with prefect-cluster, prefect-worker, private subnets, prefect_worker_sg.
-
-
-
-Cleanup
-terraform destroy
-
-
-Terminate EC2 instance in AWS Console.
-
-Notes
-
-Used prefect-api-key-new-2 due to Secrets Manager deletion conflict.
-Deleted existing IAM role, CloudWatch log group (/ecs/prefect-worker) to resolve conflicts.
-Skipped flow testing due to inability to install prefect on EC2; verified via AWS Console and logs.
-
-
+   ### 5. Verify the Deployment
+   - **AWS Console (ap-south-1)**:
+     - **ECS** > **Clusters**: Confirm `prefect-cluster` exists.
+     - **ECS** > **Services**: Verify `dev-worker` is running (1 task, healthy).
+     - **Secrets Manager**: Check `prefect-api-key-new-2` contains the correct **API key**.
+     - **IAM** > **Roles**: Confirm `prefect-task-execution-role` with attached policies.
+     - **VPC**: Verify `prefect-ecs` VPC with 6 subnets (3 public, 3 private), NAT gateway, and tags (`Name = prefect-ecs`).
+     - **CloudWatch** > **Log Groups**: Check `/ecs/prefect-worker` for worker logs (e.g., startup, API connection attempts).
+   - **Prefect Cloud**:
+     - Visit [**Prefect Cloud**](https://app.prefect.cloud).
+     - Confirm `Prefect:managed` work pool exists (ECS work pool not supported in free tier
